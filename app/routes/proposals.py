@@ -89,6 +89,16 @@ async def _get_owned_project(
     return project
 
 
+def _status_str(current: ProductStatus | str) -> str:
+    """Coerce a product status to its plain string value.
+
+    SQLAlchemy stores Product.status as a raw String(20) column, so a
+    freshly-loaded or refreshed instance holds a plain str, not the
+    ProductStatus enum — mirrors the coercion in Product.validate_transition.
+    """
+    return current.value if isinstance(current, ProductStatus) else str(current)
+
+
 async def _get_proposal_by_token(share_token: str, db: AsyncSession) -> Proposal:
     """Fetch a proposal by share_token, 404 if not found."""
     result = await db.execute(
@@ -196,7 +206,7 @@ async def approve_proposal_product(  # noqa: B008
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=(
                 "Cannot approve a product that is not in 'proposed' status "
-                f"(current: '{product.status.value}')."
+                f"(current: '{_status_str(product.status)}')."
             ),
         )
 
@@ -213,5 +223,5 @@ async def approve_proposal_product(  # noqa: B008
     await db.flush()
     await db.refresh(product)
     return ProposalProductApprovalResponse(
-        id=product.id, name=product.name, status=product.status.value
+        id=product.id, name=product.name, status=_status_str(product.status)
     )
