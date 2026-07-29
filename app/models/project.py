@@ -40,7 +40,13 @@ class Project(Base):
 
     # Relationships
     designer: Mapped["Designer"] = relationship(  # type: ignore[name-defined]  # noqa: F821
-        "Designer"
+        "Designer", back_populates="projects"
+    )
+    clients: Mapped[list["Client"]] = relationship(  # type: ignore[name-defined]  # noqa: F821
+        "Client", back_populates="project", cascade="all, delete-orphan"
+    )
+    products: Mapped[list["Product"]] = relationship(  # type: ignore[name-defined]  # noqa: F821
+        "Product", back_populates="project", cascade="all, delete-orphan"
     )
 
     def __init__(self, **kwargs: object) -> None:

@@ -1,17 +1,16 @@
 """Authentication routes — register, login, JWT, user info."""
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, EmailStr, field_validator
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.models.designer import Designer
+from app.routes.dependencies import get_current_designer
 from app.services.auth import AuthService
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
-security = HTTPBearer(auto_error=False)
 
 
 # ── Schemas ───────────────────────────────────────────────────────────────────
@@ -57,33 +56,9 @@ class TokenResponse(BaseModel):
 
 # ── Dependencies ──────────────────────────────────────────────────────────────
 
-
-async def get_current_designer(
-    credentials: HTTPAuthorizationCredentials | None = Depends(security),  # noqa: B008
-    db: AsyncSession = Depends(get_db),  # noqa: B008
-) -> Designer:
-    """Dependency that extracts and validates the current designer from JWT."""
-    if credentials is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated"
-        )
-
-    payload = AuthService.decode_access_token(credentials.credentials)
-    if payload is None or "sub" not in payload:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
-        )
-
-    designer_id = payload["sub"]
-    result = await db.execute(select(Designer).where(Designer.id == designer_id))
-    designer = result.scalar_one_or_none()
-
-    if designer is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Designer not found"
-        )
-
-    return designer
+# get_current_designer is imported from app.routes.dependencies
+# (re-exported here for backwards compatibility with external consumers).
+__all__ = ["get_current_designer"]
 
 
 # ── Routes ────────────────────────────────────────────────────────────────────
