@@ -21,3 +21,4 @@ mypy==1.14.1
 types-passlib==1.7.7.20240819
 bcrypt==4.2.1
 aiosqlite==0.22.1
+email-validator==2.2.0
