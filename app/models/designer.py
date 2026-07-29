@@ -4,7 +4,7 @@ import uuid
 from datetime import UTC, datetime
 
 from sqlalchemy import DateTime, String, Text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
@@ -25,6 +25,11 @@ class Designer(Base):
         DateTime(timezone=True),
         default=lambda: datetime.now(UTC),
         nullable=False,
+    )
+
+    # Relationships
+    projects: Mapped[list["Project"]] = relationship(  # type: ignore[name-defined]  # noqa: F821
+        "Project", back_populates="designer"
     )
 
     def __init__(self, **kwargs: object) -> None:

@@ -30,7 +30,7 @@ class Client(Base):
 
     # Relationships
     project: Mapped["Project"] = relationship(  # type: ignore[name-defined]  # noqa: F821
-        "Project"
+        "Project", back_populates="clients"
     )
 
     def __init__(self, **kwargs: object) -> None:

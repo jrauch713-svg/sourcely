@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routes import auth
+from app.routes import auth, products, projects
 
 app = FastAPI(
     title="Sourcely API",
@@ -24,6 +24,8 @@ app.add_middleware(
 
 # Routers
 app.include_router(auth.router)
+app.include_router(projects.router)
+app.include_router(products.router)
 
 
 @app.get("/api/health")
