@@ -48,6 +48,9 @@ class Project(Base):
     products: Mapped[list["Product"]] = relationship(  # type: ignore[name-defined]  # noqa: F821
         "Product", back_populates="project", cascade="all, delete-orphan"
     )
+    proposals: Mapped[list["Proposal"]] = relationship(  # type: ignore[name-defined]  # noqa: F821
+        "Proposal", back_populates="project", cascade="all, delete-orphan"
+    )
 
     def __init__(self, **kwargs: object) -> None:
         kwargs.setdefault("status", "draft")
